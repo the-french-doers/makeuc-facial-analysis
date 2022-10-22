@@ -1,3 +1,4 @@
+import enum
 import cv2
 import mediapipe as mp
 
@@ -34,9 +35,8 @@ with mp_face_mesh.FaceMesh(
 
         results = face_mesh.process(image)
 
-        if i == 1:
-            i += 1
-            print(len(results.multi_face_landmarks))
+        for index, face_landmarks in enumerate(results.multi_face_landmarks):
+            print(index)
 
         # Draw the face mesh annotations on the image.
         image.flags.writeable = True
