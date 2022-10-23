@@ -69,24 +69,18 @@ class LandmarksManager:
 
         scale = get_distance_between_2d_points(leftIris, rightIris, frame_shape)
 
-        result_both = []
+        result = []
 
-        for nostril_left, nostril_right in zip(self.nostrils[0], self.nostrils[1]):
-            result_single = []
-            for i_left, i_right in zip(nostril_left, nostril_right):
-                toAdd = []
+        for i_left, i_right in zip(self.nostrils[0], self.nostrils[1]):
+            toAdd = []
 
-                for j_left, j_right in zip(nostril_left, nostril_right):
-                    left = get_distance_between_2d_points(landmarks[i_left], landmarks[j_left], frame_shape) / scale
-                    right = get_distance_between_2d_points(landmarks[i_right], landmarks[j_right], frame_shape) / scale
+            for j_left, j_right in zip(self.nostrils[0], self.nostrils[1]):
+                left = get_distance_between_2d_points(landmarks[i_left], landmarks[j_left], frame_shape) / scale
+                right = get_distance_between_2d_points(landmarks[i_right], landmarks[j_right], frame_shape) / scale
 
-                    toAdd.append((left + right) / 2)
+                toAdd.append((left + right) / 2)
 
-                result_single.append(toAdd)
-
-            result_both.append(result_single)
-
-        result = (result_both[0] + result_both[1]) / 2
+            result.append(toAdd)
 
         return result
 
@@ -104,7 +98,7 @@ class LandmarksManager:
     def get_nostril_change(self, prev_data_nostril, data_nostril) -> str:
         error = calculate_error(prev_data_nostril, data_nostril)
 
-        if np.abs(error) <= 20:
+        if np.abs(error) <= 3:
             return "same"
         else:
             if error > 0:
