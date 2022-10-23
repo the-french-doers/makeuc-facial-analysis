@@ -3,12 +3,12 @@ import cv2
 
 
 class GaussManager:
-    def __init__(self):
+    def __init__(self) -> None:
         self.video_channels = 3
-        self.video_frame_rate = 60
+        self.video_frame_rate = 30
         self.levels = 3
         self.min_frequency = 0.8
-        self.max_frequency = 1.3
+        self.max_frequency = 2
         self.buffer_size = 150
         self.buffer_index = 0
 
@@ -25,7 +25,7 @@ class GaussManager:
 
         self.i = 0
 
-    def buildGauss(self, frame, levels):
+    def buildGauss(self, frame, levels) -> list:
         pyramid = [frame]
 
         for _ in range(levels):
@@ -34,7 +34,7 @@ class GaussManager:
 
         return pyramid
 
-    def getBpm(self, frame):
+    def getBpm(self, frame) -> float:
         self.first_frame = np.zeros((frame.shape[0], frame.shape[1], self.video_channels))
 
         self.first_gauss = self.buildGauss(self.first_frame, self.levels + 1)[self.levels]

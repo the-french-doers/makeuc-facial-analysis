@@ -1,4 +1,5 @@
 import numpy as np
+import cv2
 
 from libs.mathUtils import get_distance_between_2d_points, calculate_error
 
@@ -105,3 +106,42 @@ class LandmarksManager:
                 return "bigger"
             else:
                 return "smaller"
+
+    def has_dark_circles(self, landmarks, frame_shape, frame) -> bool:
+        potential_dark_circle_upper_corner = (
+            int(landmarks[341].x * frame_shape[1]),
+            int(landmarks[341].y * frame_shape[0]),
+        )
+        potential_dark_circle_lower_corner = (
+            int(landmarks[346].x * frame_shape[1]),
+            int(landmarks[346].y * frame_shape[0]),
+        )
+
+        skin_upper_corner = (int(landmarks[329].x * frame_shape[1]), int(landmarks[329].y * frame_shape[0]))
+        skin_lower_corner = (int(landmarks[266].x * frame_shape[1]), int(landmarks[266].y * frame_shape[0]))
+
+        potential_dark_circle = frame[
+            potential_dark_circle_upper_corner[1] : potential_dark_circle_lower_corner[1],
+            potential_dark_circle_upper_corner[0] : potential_dark_circle_lower_corner[0],
+        ]
+
+        cv2.rectangle(frame, potential_dark_circle_upper_corner, potential_dark_circle_lower_corner, (0, 255, 0), 2)
+
+        cv2.rectangle(frame, skin_upper_corner, skin_lower_corner, (0, 255, 0), 2)
+
+        average_color_potential_dark_circle = potential_dark_circle.mean(axis=0).mean(axis=0)
+
+        skin = frame[
+            skin_upper_corner[1] : skin_lower_corner[1],
+            skin_upper_corner[0] : skin_lower_corner[0],
+        ]
+
+        average_color_skin = skin.mean(axis=0).mean(axis=0)
+
+        sum_colors_potential_dark_circle = sum(average_color_potential_dark_circle)
+        sum_colors_skin = sum(average_color_skin)
+
+        if sum_colors_potential_dark_circle < sum_colors_skin:
+            return True
+        else:
+            return False
